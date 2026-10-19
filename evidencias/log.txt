@@ -1,0 +1,388 @@
+
+=================== PASSO 0 - Pre-requisitos ===================
+$ docker --version
+Docker version 29.8.2, build 7fc2dff
+[exit code: 0]
+$ dotnet --version
+10.0.300
+[exit code: 0]
+$ git --version
+git version 2.53.0.windows.1
+[exit code: 0]
+$ docker run --rm hello-world
+
+Hello from Docker!
+This message shows that your installation appears to be working correctly.
+
+To generate this message, Docker took the following steps:
+ 1. The Docker client contacted the Docker daemon.
+ 2. The Docker daemon pulled the "hello-world" image from the Docker Hub.
+    (amd64)
+ 3. The Docker daemon created a new container from that image which runs the
+    executable that produces the output you are currently reading.
+ 4. The Docker daemon streamed that output to the Docker client, which sent it
+    to your terminal.
+
+To try something more ambitious, you can run an Ubuntu container with:
+ $ docker run -it ubuntu bash
+
+Share images, automate workflows, and more with a free Docker ID:
+ https://hub.docker.com/
+
+For more examples and ideas, visit:
+ https://docs.docker.com/get-started/
+
+[exit code: 0]
+
+=================== BUILD 1.0.0 ===================
+$ docker build -t devops-webapi:1.0.0 .
+#0 building with "desktop-linux" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 425B 0.0s done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for mcr.microsoft.com/dotnet/aspnet:10.0
+#2 ...
+
+#3 [internal] load metadata for mcr.microsoft.com/dotnet/sdk:10.0
+#3 DONE 0.6s
+
+#2 [internal] load metadata for mcr.microsoft.com/dotnet/aspnet:10.0
+#2 DONE 0.6s
+
+#4 [internal] load .dockerignore
+#4 transferring context: 2B done
+#4 DONE 0.0s
+
+#5 [build 1/6] FROM mcr.microsoft.com/dotnet/sdk:10.0@sha256:0d99ebf1ccad15037b5c98c9fe8979d6b8dbac23812feae2277a0b277b5c5ffa
+#5 resolve mcr.microsoft.com/dotnet/sdk:10.0@sha256:0d99ebf1ccad15037b5c98c9fe8979d6b8dbac23812feae2277a0b277b5c5ffa 0.1s done
+#5 DONE 0.1s
+
+#6 [runtime 1/3] FROM mcr.microsoft.com/dotnet/aspnet:10.0@sha256:d5633778c754e89a386882eddf8dbee6942447a8a4b8267c19cf1e1158d0b0ac
+#6 resolve mcr.microsoft.com/dotnet/aspnet:10.0@sha256:d5633778c754e89a386882eddf8dbee6942447a8a4b8267c19cf1e1158d0b0ac 0.1s done
+#6 DONE 0.1s
+
+#7 [runtime 2/3] WORKDIR /app
+#7 CACHED
+
+#8 [internal] load build context
+#8 transferring context: 71.99kB 0.1s done
+#8 DONE 0.1s
+
+#9 [build 2/6] WORKDIR /src
+#9 CACHED
+
+#10 [build 3/6] COPY DevOpsWebApi.csproj .
+#10 CACHED
+
+#11 [build 4/6] RUN dotnet restore
+#11 CACHED
+
+#12 [build 5/6] COPY . .
+#12 DONE 0.1s
+
+#13 [build 6/6] RUN dotnet publish     -c Release     -o /app/publish     --no-restore
+#13 2.488 /usr/share/dotnet/sdk/10.0.402/Sdks/Microsoft.NET.Sdk/targets/Microsoft.PackageDependencyResolution.targets(266,5): error NETSDK1064: Package Microsoft.AspNetCore.OpenApi, version 10.0.8 was not found. It might have been deleted since NuGet restore. Otherwise, NuGet restore might have only partially completed, which might have been due to maximum path length restrictions. [/src/DevOpsWebApi.csproj]
+#13 ERROR: process "/bin/sh -c dotnet publish     -c Release     -o /app/publish     --no-restore" did not complete successfully: exit code: 1
+------
+ > [build 6/6] RUN dotnet publish     -c Release     -o /app/publish     --no-restore:
+2.488 /usr/share/dotnet/sdk/10.0.402/Sdks/Microsoft.NET.Sdk/targets/Microsoft.PackageDependencyResolution.targets(266,5): error NETSDK1064: Package Microsoft.AspNetCore.OpenApi, version 10.0.8 was not found. It might have been deleted since NuGet restore. Otherwise, NuGet restore might have only partially completed, which might have been due to maximum path length restrictions. [/src/DevOpsWebApi.csproj]
+------
+Dockerfile:8
+--------------------
+   7 |     COPY . .
+   8 | >>> RUN dotnet publish \
+   9 | >>>     -c Release \
+  10 | >>>     -o /app/publish \
+  11 | >>>     --no-restore
+  12 |     
+--------------------
+ERROR: failed to build: failed to solve: process "/bin/sh -c dotnet publish     -c Release     -o /app/publish     --no-restore" did not complete successfully: exit code: 1
+[exit code: 1]
+
+=================== STAGING e PRODUCTION 1.0.0 ===================
+$ docker run -d --name devops-api-staging -p 8081:8080 -e APP_ENVIRONMENT=staging -e APP_VERSION=1.0.0 devops-webapi:1.0.0
+Unable to find image 'devops-webapi:1.0.0' locally
+docker: Error response from daemon: pull access denied for devops-webapi, repository does not exist or may require 'docker login'
+
+Run 'docker run --help' for more information
+[exit code: 125]
+$ docker run -d --name devops-api-prod -p 8082:8080 -e APP_ENVIRONMENT=production -e APP_VERSION=1.0.0 devops-webapi:1.0.0
+Unable to find image 'devops-webapi:1.0.0' locally
+docker: Error response from daemon: pull access denied for devops-webapi, repository does not exist or may require 'docker login'
+
+Run 'docker run --help' for more information
+[exit code: 125]
+$ curl -s http://localhost:8081/
+[exit code: 7]
+$ curl -s http://localhost:8082/
+[exit code: 7]
+
+=================== BUILD 1.1.0 (staging primeiro) ===================
+$ docker build -t devops-webapi:1.1.0 .
+#0 building with "desktop-linux" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 425B done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for mcr.microsoft.com/dotnet/aspnet:10.0
+#2 ...
+
+#3 [internal] load metadata for mcr.microsoft.com/dotnet/sdk:10.0
+#3 DONE 0.3s
+
+#2 [internal] load metadata for mcr.microsoft.com/dotnet/aspnet:10.0
+#2 DONE 0.3s
+
+#4 [internal] load .dockerignore
+#4 transferring context: 2B done
+#4 DONE 0.0s
+
+#5 [runtime 1/3] FROM mcr.microsoft.com/dotnet/aspnet:10.0@sha256:d5633778c754e89a386882eddf8dbee6942447a8a4b8267c19cf1e1158d0b0ac
+#5 resolve mcr.microsoft.com/dotnet/aspnet:10.0@sha256:d5633778c754e89a386882eddf8dbee6942447a8a4b8267c19cf1e1158d0b0ac 0.0s done
+#5 DONE 0.0s
+
+#6 [runtime 2/3] WORKDIR /app
+#6 CACHED
+
+#7 [build 1/6] FROM mcr.microsoft.com/dotnet/sdk:10.0@sha256:0d99ebf1ccad15037b5c98c9fe8979d6b8dbac23812feae2277a0b277b5c5ffa
+#7 resolve mcr.microsoft.com/dotnet/sdk:10.0@sha256:0d99ebf1ccad15037b5c98c9fe8979d6b8dbac23812feae2277a0b277b5c5ffa 0.0s done
+#7 DONE 0.1s
+
+#8 [internal] load build context
+#8 transferring context: 7.05kB done
+#8 DONE 0.0s
+
+#9 [build 2/6] WORKDIR /src
+#9 CACHED
+
+#10 [build 3/6] COPY DevOpsWebApi.csproj .
+#10 CACHED
+
+#11 [build 4/6] RUN dotnet restore
+#11 CACHED
+
+#12 [build 5/6] COPY . .
+#12 DONE 0.1s
+
+#13 [build 6/6] RUN dotnet publish     -c Release     -o /app/publish     --no-restore
+#13 1.313 /usr/share/dotnet/sdk/10.0.402/Sdks/Microsoft.NET.Sdk/targets/Microsoft.PackageDependencyResolution.targets(266,5): error NETSDK1064: Package Microsoft.AspNetCore.OpenApi, version 10.0.8 was not found. It might have been deleted since NuGet restore. Otherwise, NuGet restore might have only partially completed, which might have been due to maximum path length restrictions. [/src/DevOpsWebApi.csproj]
+#13 ERROR: process "/bin/sh -c dotnet publish     -c Release     -o /app/publish     --no-restore" did not complete successfully: exit code: 1
+------
+ > [build 6/6] RUN dotnet publish     -c Release     -o /app/publish     --no-restore:
+1.313 /usr/share/dotnet/sdk/10.0.402/Sdks/Microsoft.NET.Sdk/targets/Microsoft.PackageDependencyResolution.targets(266,5): error NETSDK1064: Package Microsoft.AspNetCore.OpenApi, version 10.0.8 was not found. It might have been deleted since NuGet restore. Otherwise, NuGet restore might have only partially completed, which might have been due to maximum path length restrictions. [/src/DevOpsWebApi.csproj]
+------
+Dockerfile:8
+--------------------
+   7 |     COPY . .
+   8 | >>> RUN dotnet publish \
+   9 | >>>     -c Release \
+  10 | >>>     -o /app/publish \
+  11 | >>>     --no-restore
+  12 |     
+--------------------
+ERROR: failed to build: failed to solve: process "/bin/sh -c dotnet publish     -c Release     -o /app/publish     --no-restore" did not complete successfully: exit code: 1
+[exit code: 1]
+$ docker images devops-webapi
+IMAGE   ID             DISK USAGE   CONTENT SIZE   EXTRA
+[exit code: 0]
+$ docker run -d --name devops-api-staging -p 8081:8080 -e APP_ENVIRONMENT=staging -e APP_VERSION=1.1.0 devops-webapi:1.1.0
+Unable to find image 'devops-webapi:1.1.0' locally
+docker: Error response from daemon: pull access denied for devops-webapi, repository does not exist or may require 'docker login'
+
+Run 'docker run --help' for more information
+[exit code: 125]
+$ curl -f http://localhost:8081/health
+  % Total    % Received % Xferd  Average Speed  Time    Time    Time   Current
+                                 Dload  Upload  Total   Spent   Left   Speed
+  0      0   0      0   0      0      0      0                              0  0      0   0      0   0      0      0      0           00:01              0  0      0   0      0   0      0      0      0           00:02              0
+curl: (7) Failed to connect to localhost port 8081 after 2247 ms: Could not connect to server
+[exit code: 7]
+$ curl -s http://localhost:8081/version
+[exit code: 7]
+
+=================== PROMOCAO 1.1.0 -> PRODUCTION ===================
+$ docker run -d --name devops-api-prod -p 8082:8080 -e APP_ENVIRONMENT=production -e APP_VERSION=1.1.0 devops-webapi:1.1.0
+Unable to find image 'devops-webapi:1.1.0' locally
+docker: Error response from daemon: pull access denied for devops-webapi, repository does not exist or may require 'docker login'
+
+Run 'docker run --help' for more information
+[exit code: 125]
+$ curl -f http://localhost:8082/health
+  % Total    % Received % Xferd  Average Speed  Time    Time    Time   Current
+                                 Dload  Upload  Total   Spent   Left   Speed
+  0      0   0      0   0      0      0      0                              0  0      0   0      0   0      0      0      0           00:01              0  0      0   0      0   0      0      0      0           00:02              0
+curl: (7) Failed to connect to localhost port 8082 after 2244 ms: Could not connect to server
+[exit code: 7]
+$ docker ps
+CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
+[exit code: 0]
+
+=================== RELEASE 1.2.0 COM FALHA (staging) ===================
+$ docker build -t devops-webapi:1.2.0 .
+#0 building with "desktop-linux" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 425B done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for mcr.microsoft.com/dotnet/aspnet:10.0
+#2 DONE 0.2s
+
+#3 [internal] load metadata for mcr.microsoft.com/dotnet/sdk:10.0
+#3 DONE 0.2s
+
+#4 [internal] load .dockerignore
+#4 transferring context: 2B done
+#4 DONE 0.0s
+
+#5 [runtime 1/3] FROM mcr.microsoft.com/dotnet/aspnet:10.0@sha256:d5633778c754e89a386882eddf8dbee6942447a8a4b8267c19cf1e1158d0b0ac
+#5 resolve mcr.microsoft.com/dotnet/aspnet:10.0@sha256:d5633778c754e89a386882eddf8dbee6942447a8a4b8267c19cf1e1158d0b0ac 0.0s done
+#5 DONE 0.0s
+
+#6 [runtime 2/3] WORKDIR /app
+#6 CACHED
+
+#7 [build 1/6] FROM mcr.microsoft.com/dotnet/sdk:10.0@sha256:0d99ebf1ccad15037b5c98c9fe8979d6b8dbac23812feae2277a0b277b5c5ffa
+#7 resolve mcr.microsoft.com/dotnet/sdk:10.0@sha256:0d99ebf1ccad15037b5c98c9fe8979d6b8dbac23812feae2277a0b277b5c5ffa 0.0s done
+#7 DONE 0.0s
+
+#8 [internal] load build context
+#8 transferring context: 12.17kB done
+#8 DONE 0.0s
+
+#9 [build 2/6] WORKDIR /src
+#9 CACHED
+
+#10 [build 3/6] COPY DevOpsWebApi.csproj .
+#10 CACHED
+
+#11 [build 4/6] RUN dotnet restore
+#11 CACHED
+
+#12 [build 5/6] COPY . .
+#12 DONE 0.0s
+
+#13 [build 6/6] RUN dotnet publish     -c Release     -o /app/publish     --no-restore
+#13 1.581 /usr/share/dotnet/sdk/10.0.402/Sdks/Microsoft.NET.Sdk/targets/Microsoft.PackageDependencyResolution.targets(266,5): error NETSDK1064: Package Microsoft.AspNetCore.OpenApi, version 10.0.8 was not found. It might have been deleted since NuGet restore. Otherwise, NuGet restore might have only partially completed, which might have been due to maximum path length restrictions. [/src/DevOpsWebApi.csproj]
+#13 ERROR: process "/bin/sh -c dotnet publish     -c Release     -o /app/publish     --no-restore" did not complete successfully: exit code: 1
+------
+ > [build 6/6] RUN dotnet publish     -c Release     -o /app/publish     --no-restore:
+1.581 /usr/share/dotnet/sdk/10.0.402/Sdks/Microsoft.NET.Sdk/targets/Microsoft.PackageDependencyResolution.targets(266,5): error NETSDK1064: Package Microsoft.AspNetCore.OpenApi, version 10.0.8 was not found. It might have been deleted since NuGet restore. Otherwise, NuGet restore might have only partially completed, which might have been due to maximum path length restrictions. [/src/DevOpsWebApi.csproj]
+------
+Dockerfile:8
+--------------------
+   7 |     COPY . .
+   8 | >>> RUN dotnet publish \
+   9 | >>>     -c Release \
+  10 | >>>     -o /app/publish \
+  11 | >>>     --no-restore
+  12 |     
+--------------------
+ERROR: failed to build: failed to solve: process "/bin/sh -c dotnet publish     -c Release     -o /app/publish     --no-restore" did not complete successfully: exit code: 1
+[exit code: 1]
+$ docker run -d --name devops-api-staging -p 8081:8080 -e APP_ENVIRONMENT=staging -e APP_VERSION=1.2.0 devops-webapi:1.2.0
+Unable to find image 'devops-webapi:1.2.0' locally
+docker: Error response from daemon: pull access denied for devops-webapi, repository does not exist or may require 'docker login'
+
+Run 'docker run --help' for more information
+[exit code: 125]
+$ curl -f -i http://localhost:8081/health
+  % Total    % Received % Xferd  Average Speed  Time    Time    Time   Current
+                                 Dload  Upload  Total   Spent   Left   Speed
+  0      0   0      0   0      0      0      0                              0  0      0   0      0   0      0      0      0           00:01              0  0      0   0      0   0      0      0      0           00:02              0
+curl: (7) Failed to connect to localhost port 8081 after 2230 ms: Could not connect to server
+[exit code: 7]
+
+=================== INCIDENTE: 1.2.0 em PRODUCTION ===================
+$ docker run -d --name devops-api-prod -p 8082:8080 -e APP_ENVIRONMENT=production -e APP_VERSION=1.2.0 devops-webapi:1.2.0
+Unable to find image 'devops-webapi:1.2.0' locally
+docker: Error response from daemon: pull access denied for devops-webapi, repository does not exist or may require 'docker login'
+
+Run 'docker run --help' for more information
+[exit code: 125]
+$ curl -f -i http://localhost:8082/health
+  % Total    % Received % Xferd  Average Speed  Time    Time    Time   Current
+                                 Dload  Upload  Total   Spent   Left   Speed
+  0      0   0      0   0      0      0      0                              0  0      0   0      0   0      0      0      0           00:01              0  0      0   0      0   0      0      0      0           00:02              0
+curl: (7) Failed to connect to localhost port 8082 after 2241 ms: Could not connect to server
+[exit code: 7]
+
+=================== ROLLBACK PRODUCTION -> 1.1.0 ===================
+$ docker run -d --name devops-api-prod -p 8082:8080 -e APP_ENVIRONMENT=production -e APP_VERSION=1.1.0 devops-webapi:1.1.0
+Unable to find image 'devops-webapi:1.1.0' locally
+docker: Error response from daemon: pull access denied for devops-webapi, repository does not exist or may require 'docker login'
+
+Run 'docker run --help' for more information
+[exit code: 125]
+$ curl -f http://localhost:8082/health
+  % Total    % Received % Xferd  Average Speed  Time    Time    Time   Current
+                                 Dload  Upload  Total   Spent   Left   Speed
+  0      0   0      0   0      0      0      0                              0  0      0   0      0   0      0      0      0           00:01              0  0      0   0      0   0      0      0      0           00:02              0
+curl: (7) Failed to connect to localhost port 8082 after 2226 ms: Could not connect to server
+[exit code: 7]
+$ docker ps
+CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
+[exit code: 0]
+
+=================== DOCKER COMPOSE ===================
+$ docker compose up -d
+ Image devops-webapi:1.1.0 Pulling 
+ Image devops-webapi:1.1.0 Pulling 
+ Image devops-webapi:1.1.0 Error pull access denied for devops-webapi, repository does not exist or may require 'docker login'
+ Image devops-webapi:1.1.0 Interrupted 
+Error response from daemon: pull access denied for devops-webapi, repository does not exist or may require 'docker login'
+Error response from daemon: No such image: devops-webapi:1.1.0
+[exit code: 1]
+$ docker compose ps
+NAME      IMAGE     COMMAND   SERVICE   CREATED   STATUS    PORTS
+[exit code: 0]
+$ curl -f http://localhost:8081/health
+  % Total    % Received % Xferd  Average Speed  Time    Time    Time   Current
+                                 Dload  Upload  Total   Spent   Left   Speed
+  0      0   0      0   0      0      0      0                              0  0      0   0      0   0      0      0      0           00:01              0  0      0   0      0   0      0      0      0           00:02              0
+curl: (7) Failed to connect to localhost port 8081 after 2243 ms: Could not connect to server
+[exit code: 7]
+$ curl -f http://localhost:8082/health
+  % Total    % Received % Xferd  Average Speed  Time    Time    Time   Current
+                                 Dload  Upload  Total   Spent   Left   Speed
+  0      0   0      0   0      0      0      0                              0  0      0   0      0   0      0      0      0           00:01              0  0      0   0      0   0      0      0      0           00:02              0
+curl: (7) Failed to connect to localhost port 8082 after 2238 ms: Could not connect to server
+[exit code: 7]
+$ docker compose config
+name: devopswebapi
+services:
+  production:
+    container_name: devops-api-prod
+    environment:
+      APP_ENVIRONMENT: production
+      APP_VERSION: 1.1.0
+    image: devops-webapi:1.1.0
+    networks:
+      default: null
+    ports:
+      - mode: ingress
+        target: 8080
+        published: "8082"
+        protocol: tcp
+  staging:
+    container_name: devops-api-staging
+    environment:
+      APP_ENVIRONMENT: staging
+      APP_VERSION: 1.1.0
+    image: devops-webapi:1.1.0
+    networks:
+      default: null
+    ports:
+      - mode: ingress
+        target: 8080
+        published: "8081"
+        protocol: tcp
+networks:
+  default:
+    name: devopswebapi_default
+[exit code: 0]
+$ docker compose down
+[exit code: 0]
